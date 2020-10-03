@@ -1,0 +1,27 @@
+{
+  "name": "gamomat-test",
+  "version": "1.0.0",
+  "description": "Coding test for Gamomat",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --open",
+    "build": "webpack"
+  },
+  "keywords": [
+    "Slots",
+    "Pixi"
+  ],
+  "author": "Hendrik Mueller-Roehr",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^8.0.4",
+    "typescript": "^4.0.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "pixi.js": "^5.3.3"
+  }
+}
