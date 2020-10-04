@@ -6,7 +6,6 @@ export class ReelContainer extends Container {
   private config: ReelConfig
   private reels: Reel[] = []
   private textures: TextureMap
-  private lastSpinData: any
 
   private onSpinDone: () => void
   private onSpinStart: () => void
@@ -49,7 +48,6 @@ export class ReelContainer extends Container {
 
   setSpinData(data:any) {
     this.onSpinStart()
-    this.lastSpinData = data
     for(let i = 0; i < this.reels.length; i++) {
       this.reels[i].setSpinData([...data[i + 1]])
     }

@@ -1,7 +1,7 @@
 // Taken from: https://easings.net#easeInOutBack
 
 export const EasingFunctions = {
-  easeInOutBack(x: number): number {
+  easeInOutBack(x: number) {
     const c1 = .9; // Swing on Strength
     const c2 = c1 * .9; // Swing off strength
 

@@ -66,10 +66,6 @@ export class Reel extends Container {
     return this.state === ReelState.IDLE
   }
 
-  get currentState() {
-    return this.state
-  }
-
   setInitialData(data: string[]) {
     for (let i = 1; i < this.symbols.length; i++) {
       const texture = this.textures[data[i-1] + 1]
@@ -78,7 +74,6 @@ export class Reel extends Container {
   }
 
   setSpinData(data:string[]) {
-    console.log(data.length)
     this.lastSpinData = data
     this.reelTween.start = this.currentPosition
     this.reelTween.target = this.currentPosition + data.length - 1
@@ -101,13 +96,13 @@ export class Reel extends Container {
         case ReelState.SPINNING: {
           this.reelTween.update(delta)
           this.currentPosition = this.reelTween.currentValue
-          console.log(this.currentPosition)
           for (let i = 0; i < this.symbols.length; i++) {
             const currentSymbol = this.symbols[i]
             const oldY = currentSymbol.y
+
             currentSymbol.y = (((this.currentPosition + i) % this.symbols.length) * this.reelConfig.symbolHeight) - this.reelConfig.symbolHeight
+
             if (currentSymbol.y < 0 && oldY > this.reelConfig.symbolHeight) {
-              console.log("Swapping textures")
               const nextSymbol = this.lastSpinData.pop()
               currentSymbol.texture = this.textures[nextSymbol]
             }

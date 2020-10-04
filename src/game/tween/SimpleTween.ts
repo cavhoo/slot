@@ -13,7 +13,7 @@ export enum SimpleTweenState {
   STOPPED = 'stopped'
 }
 
-const lerpFunction = (start: number, target: number, time: number) => start * ( 1 * time) + target * time
+const lerpFunction = (start: number, target: number, time: number) => start * ( 1 - time) + target * time
 
 export class SimpleTween {
   private _currentValue: number = 0
@@ -64,6 +64,9 @@ export class SimpleTween {
       time,
       onComplete
     } = this.config
+
+    // console.log(this.config)
+
 
     switch(this.state) {
         case SimpleTweenState.RUNNING: {
