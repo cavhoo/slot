@@ -4,4 +4,6 @@ export interface ReelConfig {
   visibleSymbols: number
   symbolHeight: number
   symbolWidth: number
+  swingOnSymbols: number
+  swingOffSymbols: number
 }

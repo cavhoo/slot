@@ -1,18 +1,25 @@
 import { Container } from "pixi.js";
-import { ReelConfig } from "../models";
-import { SymbolPool } from "../symbol/SymbolPool";
+import { ReelConfig, TextureMap } from "../models";
 import { Reel } from "./Reel";
 
 export class ReelContainer extends Container {
   private config: ReelConfig
   private reels: Reel[] = []
-  private pool: SymbolPool
+  private textures: TextureMap
   private lastSpinData: any
-  constructor(reelConfig: any, symbolPool: SymbolPool) {
+
+  private onSpinDone: () => void
+  private onSpinStart: () => void
+
+  constructor(reelConfig: any, textureMap: TextureMap, onSpinStart: () => void, onSpinDone: () => void) {
     super()
     this.reels = []
-    this.pool = symbolPool
+    this.textures =textureMap
     this.config = reelConfig
+
+    this.onSpinDone = onSpinDone
+    this.onSpinStart = onSpinStart
+
     this.init()
   }
 
@@ -21,7 +28,7 @@ export class ReelContainer extends Container {
       reelCount
     } = this.config
     for (let i = 0; i < reelCount; i++) {
-      this.reels.push( new Reel(this.pool, this.config.symbolWidth, this.config.symbolHeight) )
+      this.reels.push( new Reel(this.textures, this.config) )
     }
     this.addChild(...this.reels)
   }
@@ -34,17 +41,27 @@ export class ReelContainer extends Container {
     return this.reels[id] ?? null
   }
 
+  setInitalData(data:any) {
+    for(let i = 0; i < this.reels.length; i++) {
+      this.reels[i].setInitialData(data[i + 1])
+    }
+  }
+
   setSpinData(data:any) {
-    console.log(this.lastSpinData)
+    this.onSpinStart()
     this.lastSpinData = data
     for(let i = 0; i < this.reels.length; i++) {
-      this.reels[i].setSpinData(data[i + 1])
-      console.log(data[i + 1])
+      this.reels[i].setSpinData([...data[i + 1]])
     }
   }
 
   update(delta:number) {
     this.reels.forEach((reel) => reel.update(delta))
+
+    const allDone = this.reels.every((reel) => reel.hasReachedEnd)
+    if (allDone) {
+      this.onSpinDone()
+    }
   }
 
   getWidth(): number {
@@ -55,4 +72,9 @@ export class ReelContainer extends Container {
     return this.config.visibleSymbols * this.config.symbolHeight
   }
 
+  set spinDuration(value: number) {
+    for (var i = 0; i < this.reels.length; i++) {
+      this.reels[i].spinDuration = value
+    }
+  }
 }

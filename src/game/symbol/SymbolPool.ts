@@ -20,7 +20,6 @@ export class SymbolPool {
     //   this.pools[symbolId] = []
     //   return new Symbol(symbolId, this.textures[symbolId])
     // }
-    console.log(this.textures[symbolId])
     // return
     //this.pools[symbolId].pop() ?? new Symbol(symbolId, this.textures[symbolId])
   }

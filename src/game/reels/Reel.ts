@@ -1,57 +1,124 @@
 import { Container, Graphics } from "pixi.js";
+import { EasingFunctions } from "../../utils/Easing";
+import { ReelConfig, TextureMap } from "../models";
 import { ReelState } from "../models/ReelState.model";
 import { Symbol } from "../symbol/Symbol";
-import { SymbolPool } from "../symbol/SymbolPool";
+import { SimpleTween } from "../tween/SimpleTween";
 
 export class Reel extends Container {
-  private pool: SymbolPool
+  private reelConfig: ReelConfig
+  private textures: TextureMap
   private state: ReelState = ReelState.IDLE
-  private stripe: Symbol[] = []
-  private container: Container
-  private symbolData: {width: number, height: number}
+  private currentPosition: number = 0
+  private symbols: Symbol[] = []
+  private lastSpinData: string[]
+  private reelTween: SimpleTween
 
-  constructor(symbolPool: SymbolPool, symbolWidth: number, symbolHeight: number) {
+  public spinDuration: number = 3000
+
+  constructor(textureMap: TextureMap, config: ReelConfig) {
     super()
-    this.pool = symbolPool
-    this.container = new Container()
-    this.symbolData = {
-      width: symbolWidth,
-      height: symbolHeight
-    }
+    this.textures = textureMap
+    this.reelConfig = config
+    this.reelTween = new SimpleTween({
+      begin: 0,
+      target: 0,
+      time: 0,
+      onComplete: () => {
+        this.state = ReelState.IDLE
+      },
+      easingFunction: EasingFunctions.easeInOutBack
+    })
+
+    this.createSymbols()
     this.createReelMask()
-    this.addChild(this.container)
+  }
+
+  private createSymbols() {
+    const {
+      visibleSymbols,
+      swingOffSymbols,
+      swingOnSymbols,
+      symbolHeight
+    } = this.reelConfig
+
+    const totalSymbols = visibleSymbols + swingOffSymbols + swingOnSymbols + 1
+
+    for (let i = 0; i < totalSymbols; i++) {
+      const symbol = new Symbol('1', this.textures[1])
+      this.symbols.push(symbol)
+      symbol.y = (i * symbolHeight * -1) + symbolHeight
+      this.addChild(symbol)
+    }
   }
 
 
   private createReelMask() {
     const reelMask = new Graphics()
     reelMask.beginFill(0x000000);
-    reelMask.drawRect(0, 0, this.symbolData.width, this.symbolData.height)
+    reelMask.drawRect(0, 0, this.reelConfig.symbolWidth, this.reelConfig.symbolHeight)
     reelMask.endFill()
     this.addChild(reelMask)
-    this.container.mask = reelMask
+    this.mask = reelMask
+  }
+
+  get hasReachedEnd():boolean {
+    return this.state === ReelState.IDLE
   }
 
   get currentState() {
     return this.state
   }
 
-  setSpinData(data:string[]) {
-    let nextY = 0
-    for(let i = 0; i < data.length; i++) {
-      const symbol = this.pool.getSymbol(data[i])
-      symbol.position.set(0, nextY)
-      this.container.addChild(symbol)
-      nextY -= symbol.height
+  setInitialData(data: string[]) {
+    for (let i = 1; i < this.symbols.length; i++) {
+      const texture = this.textures[data[i-1] + 1]
+      this.symbols[i].texture = texture
     }
   }
 
+  setSpinData(data:string[]) {
+    console.log(data.length)
+    this.lastSpinData = data
+    this.reelTween.start = this.currentPosition
+    this.reelTween.target = this.currentPosition + data.length - 1
+    this.reelTween.time = this.spinDuration
+    this.reelTween.easingFunction = EasingFunctions.easeInOutBack
+    this.startSpin()
+  }
+
   startSpin() {
-    this.state = ReelState.SPINNING
+    this.state = ReelState.STARTING
   }
 
   update(delta: number) {
-    //this.container.position.y += 1 * delta
+    switch(this.state) {
+        case ReelState.STARTING: {
+          this.reelTween.play()
+          this.state = ReelState.SPINNING
+          break;
+        }
+        case ReelState.SPINNING: {
+          this.reelTween.update(delta)
+          this.currentPosition = this.reelTween.currentValue
+          console.log(this.currentPosition)
+          for (let i = 0; i < this.symbols.length; i++) {
+            const currentSymbol = this.symbols[i]
+            const oldY = currentSymbol.y
+            currentSymbol.y = (((this.currentPosition + i) % this.symbols.length) * this.reelConfig.symbolHeight) - this.reelConfig.symbolHeight
+            if (currentSymbol.y < 0 && oldY > this.reelConfig.symbolHeight) {
+              console.log("Swapping textures")
+              const nextSymbol = this.lastSpinData.pop()
+              currentSymbol.texture = this.textures[nextSymbol]
+            }
+
+          }
+          break;
+        }
+        default: {
+          this.state = ReelState.IDLE
+        }
+    }
   }
 
 }
