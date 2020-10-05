@@ -1,7 +1,6 @@
 import { Container, Graphics } from "pixi.js";
 import { EasingFunctions } from "../../utils/Easing";
-import { ReelConfig, TextureMap } from "../models";
-import { ReelState } from "../models/ReelState.model";
+import { ReelConfig, TextureMap, ReelState } from "../models";
 import { Symbol } from "../symbol/Symbol";
 import { SimpleTween } from "../tween/SimpleTween";
 

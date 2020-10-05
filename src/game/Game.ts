@@ -36,16 +36,8 @@ export class Game extends Container {
     })
 
     textureLoader.onComplete.add((loader, resources) => {
-      this.textures = {
-        1: resources['1'].texture,
-        2: resources['2'].texture,
-        3: resources['3'].texture,
-        4: resources['4'].texture,
-        5: resources['5'].texture,
-        6: resources['6'].texture,
-        7: resources['7'].texture,
-        bg: resources['bg'].texture,
-        reelContainer: resources['reelContainer'].texture
+      for (let key in resources) {
+        this.textures[key] = resources[key].texture
       }
       this.start()
     })
