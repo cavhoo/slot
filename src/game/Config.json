@@ -12,5 +12,17 @@
   "commonGfx": {
     "bg": "./assets/background.jpg",
     "reelContainer": "./assets/reelcontainer.png"
+  },
+  "reelConfig": {
+    "reelCount": 1,
+    "visibleSymbols": 1,
+    "symbolWidth": 204,
+    "symbolHeight": 144,
+    "swingOnSymbols": 1,
+    "swingOffSymbols": 1
+  },
+  "spinSettings": {
+    "defaultDuration": 3000,
+    "symbolCount": 25
   }
 }

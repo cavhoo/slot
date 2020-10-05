@@ -68,7 +68,7 @@ export class Reel extends Container {
 
   setInitialData(data: string[]) {
     for (let i = 1; i < this.symbols.length; i++) {
-      const texture = this.textures[data[i-1] + 1]
+      const texture = this.textures[data[i-1]]
       this.symbols[i].texture = texture
     }
   }
